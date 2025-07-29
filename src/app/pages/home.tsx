@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <DocumentProvider>
       <div className="p-4">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col items-center justify-between mb-4 w-full">
           <h1 className="text-3xl font-bold">Documents</h1>
           <DocumentSort />
         </div>
