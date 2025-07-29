@@ -1,13 +1,16 @@
 import { loadDocuments } from "../app/useCases/fetchDocuments";
 import { createDocumentSocket } from "../infrastructure/websocket/documentSocket";
 import { Document } from "../domain/document";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useMemo } from "react";
 
 interface DocumentContextType {
-  documents: Document[];
+  documents: Document[];         // Lista original sin ordenar (opcional)
+  sortedDocuments: Document[];   // Lista ordenada según sortBy
   addDocument: (doc: Document) => void;
-  sortBy: string;
-  setSortBy: (s: string) => void;
+  sortBy: "name" | "version" | "createdAt";
+  setSortBy: (s: "name" | "version" | "createdAt") => void;
+  isColumnView: boolean;
+  setIsColumnView: (b: boolean) => void;
 }
 
 export const DocumentContext = createContext<DocumentContextType | null>(null);
@@ -15,25 +18,46 @@ export const DocumentContext = createContext<DocumentContextType | null>(null);
 export const DocumentProvider = ({ children }: { children: React.ReactNode }) => {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [sortBy, setSortBy] = useState<"name" | "version" | "createdAt">("createdAt");
+  const [isColumnView, setIsColumnView] = useState(false);
 
   const addDocument = (doc: Document) => {
-    setDocuments(prev => [...prev, doc]);
+    setDocuments((prev) => [...prev, doc]);
   };
 
   useEffect(() => {
-    loadDocuments().then(setDocuments).catch(console.error);
+    loadDocuments()
+      .then(setDocuments)
+      .catch(console.error);
 
     const socket = createDocumentSocket((notification) => {
-      // Puedes usar DocumentID y DocumentTitle si quieres notificar.
       console.log("New document created by other user", notification);
-      // No se agrega automáticamente el documento completo aquí (a no ser que se vuelva a pedir por ID).
+      // Aquí podrías añadir lógica para refrescar documentos o hacer fetch por ID si quieres
     });
 
     return () => socket.close();
   }, []);
 
+  const sortedDocuments = useMemo(() => {
+    return [...documents].sort((a, b) => {
+      if (sortBy === "name") return a.Title.localeCompare(b.Title);
+      if (sortBy === "version") return a.Version.localeCompare(b.Version);
+      if (sortBy === "createdAt") return new Date(a.CreatedAt).getTime() - new Date(b.CreatedAt).getTime();
+      return 0;
+    });
+  }, [documents, sortBy]);
+
   return (
-    <DocumentContext.Provider value={{ documents, addDocument, sortBy, setSortBy }}>
+    <DocumentContext.Provider
+      value={{
+        documents,
+        sortedDocuments,
+        addDocument,
+        sortBy,
+        setSortBy,
+        isColumnView,
+        setIsColumnView,
+      }}
+    >
       {children}
     </DocumentContext.Provider>
   );
