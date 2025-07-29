@@ -1,21 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
 import { useDocumentContext } from "../../../context/DocumentContext";
+import DocumentCard from "./DocumentCard";
 
 export default function DocumentsList() {
   const { documents } = useDocumentContext();
+  const [isColumnView, setIsColumnView] = useState(true); // control de vista
 
   if (documents.length === 0) return <p>No hay documentos para mostrar</p>;
 
   return (
-    <ul>
+    <div className={`grid ${
+      isColumnView ? "grid-cols-3 gap-4" : "grid-rows-1 gap-4"
+      }`}>
+      {/* Aquí podrías añadir el botón/icono que cambia isColumnView */}
+
       {documents.map((doc) => (
-        <li key={doc.ID} className="border p-2 mb-2">
-          <h2 className="font-semibold">{doc.Title}</h2>
-          <p>Versión: {doc.Version}</p>
-          <p>Creado: {new Date(doc.CreatedAt).toLocaleDateString()}</p>
-          <p>Contribuyentes: {doc.Contributors.map(c => c.Name).join(", ")}</p>
-        </li>
+        <DocumentCard
+          key={doc.ID}
+          Title={doc.Title}
+          Version={doc.Version}
+          Contributors={doc.Contributors}
+          Attachments={doc.Attachments}
+          isColumnView={isColumnView}
+        />
       ))}
-    </ul>
+      <button className="border w-full px-6 py-8 bg-gray-200 text-blue-400 rounded">
+        + Add document
+      </button>
+    </div>
   );
 }
