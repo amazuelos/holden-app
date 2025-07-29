@@ -1,51 +1,46 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import { loadDocuments } from "../app/useCases/fetchDocuments";
+import { createDocumentSocket } from "../infrastructure/websocket/documentSocket";
 import { Document } from "../domain/document";
+import { createContext, useContext, useEffect, useState } from "react";
 
-interface DocumentContextValue {
+interface DocumentContextType {
   documents: Document[];
   addDocument: (doc: Document) => void;
-  setDocuments: (docs: Document[]) => void;
-  sortBy: (key: "name" | "version" | "createdAt") => void;
+  sortBy: string;
+  setSortBy: (s: string) => void;
 }
 
-const DocumentContext = createContext<DocumentContextValue | undefined>(undefined);
+export const DocumentContext = createContext<DocumentContextType | null>(null);
 
-export function DocumentProvider({ children }: { children: ReactNode }) {
-  const [documents, setDocumentsState] = useState<Document[]>([]);
-  const [sortKey, setSortKey] = useState<"name" | "version" | "createdAt">("createdAt");
+export const DocumentProvider = ({ children }: { children: React.ReactNode }) => {
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [sortBy, setSortBy] = useState<"name" | "version" | "createdAt">("createdAt");
 
-  function sortBy(key: "name" | "version" | "createdAt") {
-    setSortKey(key);
-    setDocumentsState(prev => {
-      const sorted = [...prev].sort((a, b) => {
-        if (key === "name") return a.name.localeCompare(b.name);
-        if (key === "version") return b.version - a.version;
-        if (key === "createdAt") return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        return 0;
-      });
-      return sorted;
+  const addDocument = (doc: Document) => {
+    setDocuments(prev => [...prev, doc]);
+  };
+
+  useEffect(() => {
+    loadDocuments().then(setDocuments).catch(console.error);
+
+    const socket = createDocumentSocket((notification) => {
+      // Puedes usar DocumentID y DocumentTitle si quieres notificar.
+      console.log("New document created by other user", notification);
+      // No se agrega automáticamente el documento completo aquí (a no ser que se vuelva a pedir por ID).
     });
-  }
 
-  function setDocuments(docs: Document[]) {
-    setDocumentsState(docs);
-  }
-
-  function addDocument(doc: Document) {
-    setDocumentsState(prev => [doc, ...prev]);
-  }
+    return () => socket.close();
+  }, []);
 
   return (
-    <DocumentContext.Provider value={{ documents, addDocument, setDocuments, sortBy }}>
+    <DocumentContext.Provider value={{ documents, addDocument, sortBy, setSortBy }}>
       {children}
     </DocumentContext.Provider>
   );
-}
+};
 
-export function useDocuments() {
-  const context = useContext(DocumentContext);
-  if (!context) {
-    throw new Error("useDocuments must be used within a DocumentProvider");
-  }
-  return context;
+export function useDocumentContext() {
+  const ctx = useContext(DocumentContext);
+  if (!ctx) throw new Error("Must be used within DocumentProvider");
+  return ctx;
 }

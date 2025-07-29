@@ -1,6 +1,6 @@
 import React from "react";
 import { DocumentList } from "../components/DocumentList";
-import { useFetchDocuments } from "../../app/document/useFetchDocuments";
+import { useFetchDocuments } from "../../app/useCases/fetchDocuments";
 
 export function Home() {
   useFetchDocuments();

@@ -1,22 +1,28 @@
-import { Document } from "../../domain/document";
+interface DocumentNotification {
+  Timestamp: string;
+  UserID: string;
+  UserName: string;
+  DocumentID: string;
+  DocumentTitle: string;
+}
 
-const WS_URL = "ws://localhost:4000";
+type Callback = (msg: DocumentNotification) => void;
 
-export function connectDocumentSocket(onNewDocument: (doc: Document) => void) {
-  const socket = new WebSocket(WS_URL);
+export function createDocumentSocket(onMessage: Callback) {
+  const interval = setInterval(() => {
+    const fakeNotification: DocumentNotification = {
+      Timestamp: new Date().toISOString(),
+      UserID: "mock-user-id",
+      UserName: "Mock User",
+      DocumentID: "mock-doc-id",
+      DocumentTitle: "Documento falso " + Math.floor(Math.random() * 100),
+    };
+    onMessage(fakeNotification);
+  }, 5000);
 
-  socket.onopen = () => console.log("WebSocket connected");
-
-  socket.onmessage = event => {
-    const data = JSON.parse(event.data);
-    if (data.type === "new_document") {
-      onNewDocument(data.payload);
+  return {
+    close() {
+      clearInterval(interval);
     }
   };
-
-  socket.onerror = error => console.error("WebSocket error", error);
-
-  socket.onclose = () => console.log("WebSocket closed");
-
-  return socket;
 }
