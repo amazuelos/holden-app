@@ -2,9 +2,7 @@ import { Document } from "../../domain/document";
 
 const WS_URL = "ws://localhost:4000";
 
-export function connectDocumentSocket(
-  onNewDocument: (doc: Document) => void
-) {
+export function connectDocumentSocket(onNewDocument: (doc: Document) => void) {
   const socket = new WebSocket(WS_URL);
 
   socket.onopen = () => console.log("WebSocket connected");

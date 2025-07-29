@@ -1,7 +1,11 @@
+import React from "react";
+import { DocumentProvider } from "./context/DocumentContext";
+import { Home } from "./ui/pages/Home";
+
 export default function App() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <h1 className="text-4xl font-bold text-blue-600">init config run</h1>
-    </div>
+    <DocumentProvider>
+      <Home />
+    </DocumentProvider>
   );
 }
