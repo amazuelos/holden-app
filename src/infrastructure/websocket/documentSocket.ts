@@ -1,14 +1,7 @@
-interface DocumentNotification {
-  Timestamp: string;
-  UserID: string;
-  UserName: string;
-  DocumentID: string;
-  DocumentTitle: string;
-}
-
 type Callback = (msg: DocumentNotification) => void;
 
 export function createDocumentSocket(onMessage: Callback) {
+  // Simula notificaciones cada 5 segundos
   const interval = setInterval(() => {
     const fakeNotification: DocumentNotification = {
       Timestamp: new Date().toISOString(),
@@ -18,11 +11,11 @@ export function createDocumentSocket(onMessage: Callback) {
       DocumentTitle: "Documento falso " + Math.floor(Math.random() * 100),
     };
     onMessage(fakeNotification);
-  }, 5000);
+  }, 10000);
 
   return {
     close() {
       clearInterval(interval);
-    }
+    },
   };
 }

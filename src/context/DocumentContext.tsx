@@ -1,7 +1,7 @@
 import { loadDocuments } from "../app/useCases/fetchDocuments";
 import { createDocumentSocket } from "../infrastructure/websocket/documentSocket";
 import { Document } from "../domain/document";
-import { createContext, useContext, useEffect, useState, useMemo } from "react";
+import { createContext, useContext, useEffect, useState, useMemo, useRef } from "react";
 
 interface DocumentContextType {
   documents: Document[];
@@ -11,6 +11,8 @@ interface DocumentContextType {
   setSortBy: (s: "name" | "version" | "createdAt") => void;
   isColumnView: boolean;
   setIsColumnView: (b: boolean) => void;
+  notification: string | null;
+  setNotification: (msg: string | null) => void;
 }
 
 export const DocumentContext = createContext<DocumentContextType | null>(null);
@@ -19,6 +21,10 @@ export const DocumentProvider = ({ children }: { children: React.ReactNode }) =>
   const [documents, setDocuments] = useState<Document[]>([]);
   const [sortBy, setSortBy] = useState<"name" | "version" | "createdAt">("createdAt");
   const [isColumnView, setIsColumnView] = useState(false);
+  const [notification, setNotification] = useState<string | null>(null);
+
+  // UseRef to track which document IDs have been notified to avoid duplicates
+  const notifiedDocs = useRef<Set<string>>(new Set());
 
   const addDocument = (doc: Document) => {
     setDocuments((prev) => [...prev, doc]);
@@ -29,14 +35,14 @@ export const DocumentProvider = ({ children }: { children: React.ReactNode }) =>
       .then(setDocuments)
       .catch(console.error);
 
-    const socket = createDocumentSocket((notification) => {
-      console.log("New document created by other user", notification);
+    const socket = createDocumentSocket((notificationData) => {
+      setNotification(`A new document "${notificationData.DocumentTitle}" has been added by another user.`);
+      setTimeout(() => setNotification(null), 3000);
     });
 
     return () => socket.close();
   }, []);
 
-  // Aquí es donde ordenamos la lista según el sortBy y documentos actualizados
   const sortedDocuments = useMemo(() => {
     return [...documents].sort((a, b) => {
       if (sortBy === "name") return a.Title.localeCompare(b.Title);
@@ -56,6 +62,8 @@ export const DocumentProvider = ({ children }: { children: React.ReactNode }) =>
         setSortBy,
         isColumnView,
         setIsColumnView,
+        notification,
+        setNotification,
       }}
     >
       {children}
