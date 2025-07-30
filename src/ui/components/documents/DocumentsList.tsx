@@ -1,7 +1,11 @@
 import DocumentCard from "./DocumentCard";
 import { useDocumentContext } from "../../../context/DocumentContext";
 
-export default function DocumentsList() {
+type Props = {
+  onAddNewDocument: () => void;
+};
+
+export default function DocumentsList({ onAddNewDocument }: Props) {
   const { documents, isColumnView } = useDocumentContext();
 
   return (
@@ -16,6 +20,11 @@ export default function DocumentsList() {
           isColumnView={isColumnView}
         />
       ))}
+      <button 
+        onClick={onAddNewDocument}
+        className="border w-full px-6 py-8 bg-white text-blue-400 rounded flex items-center justify-center">
+        + Add New Document
+      </button>
     </div>
   );
 }
