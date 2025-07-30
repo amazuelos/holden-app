@@ -48,7 +48,7 @@ export default function DocumentForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-2 p-4 border rounded">
       <h2 className="text-xl font-semibold">Create New Document</h2>
 
       {errors.length > 0 && (

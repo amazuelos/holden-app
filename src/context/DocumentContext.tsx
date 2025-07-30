@@ -4,8 +4,8 @@ import { Document } from "../domain/document";
 import { createContext, useContext, useEffect, useState, useMemo } from "react";
 
 interface DocumentContextType {
-  documents: Document[];         // Lista original sin ordenar (opcional)
-  sortedDocuments: Document[];   // Lista ordenada según sortBy
+  documents: Document[];
+  sortedDocuments: Document[];
   addDocument: (doc: Document) => void;
   sortBy: "name" | "version" | "createdAt";
   setSortBy: (s: "name" | "version" | "createdAt") => void;
@@ -31,12 +31,12 @@ export const DocumentProvider = ({ children }: { children: React.ReactNode }) =>
 
     const socket = createDocumentSocket((notification) => {
       console.log("New document created by other user", notification);
-      // Aquí podrías añadir lógica para refrescar documentos o hacer fetch por ID si quieres
     });
 
     return () => socket.close();
   }, []);
 
+  // Aquí es donde ordenamos la lista según el sortBy y documentos actualizados
   const sortedDocuments = useMemo(() => {
     return [...documents].sort((a, b) => {
       if (sortBy === "name") return a.Title.localeCompare(b.Title);

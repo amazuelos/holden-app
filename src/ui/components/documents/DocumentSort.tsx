@@ -1,49 +1,43 @@
 import React from "react";
 import { useDocumentContext } from "../../../context/DocumentContext";
-import { MdViewList, MdGridView } from "react-icons/md";
+import { FaTh, FaList } from "react-icons/fa";
 
 export default function DocumentSort() {
-  const { sortKey, setSortKey, isColumnView, setIsColumnView } = useDocumentContext();
+  const {
+    sortBy,
+    setSortBy,
+    isColumnView,
+    setIsColumnView,
+  } = useDocumentContext();
+
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortBy(e.target.value as "name" | "version" | "createdAt");
+  };
 
   return (
-    <div className="flex gap-4 justify-between w-full">
-      <div className="flex textitems-center gap-2">
-        <span className="text-lg font-semibold">Sort by:</span>
+    <div className="flex items-center justify-between mb-4 w-full">
+      <div className="flex items-center space-x-2">
+        <p className="text-blue-400">Sort by: </p>
         <select
-          value={sortKey}
-          onChange={(e) => setSortKey(e.target.value as "name" | "version" | "created")}
-          className="p-2 rounded border"
+          value={sortBy}
+          onChange={handleSortChange}
+          className="p-2 border rounded"
         >
-          <option value="name">Name</option>
+          <option value="createdAt">Created At</option>
+          <option value="name">Title</option>
           <option value="version">Version</option>
-          <option value="created">Date</option>
         </select>
       </div>
-
-      <div className="flex gap-2">
-        <button
-          onClick={() => setIsColumnView(true)}
-          className={`p-2 border rounded text-xl ${
-            !isColumnView ? "text-black" : "text-white bg-black hover:bg-gray-200"
-          }`}
-          aria-label="List view"
-          title="List view"
-        >
-          <MdViewList />
-        </button>
-
-        <button
+      <div className="flex items-center space-x-2 ml-4">
+        <FaList
           onClick={() => setIsColumnView(false)}
-          className={`p-2 border rounded text-xl ${
-            isColumnView ? "text-black" : "text-white bg-black hover:bg-gray-200"
-          }`}
-          aria-label="Grid view"
-          title="Grid view"
-        >
-          <MdGridView />
-        </button>
+          className={`cursor-pointer ${!isColumnView ? "text-blue-500" : ""}`}
+        />
+        <FaTh
+          onClick={() => setIsColumnView(true)}
+          className={`cursor-pointer ${isColumnView ? "text-blue-500" : ""}`}
+        />
       </div>
-      
     </div>
   );
 }

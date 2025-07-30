@@ -15,7 +15,7 @@ function HomeContent() {
   };
 
   return (
-    <div className="p-4">
+    <div className="flex flex-col gap-4 p-4">
       <div className="flex flex-col items-center justify-between mb-4 w-full">
         <h1 className="text-3xl font-bold">Documents</h1>
         <DocumentSort />
@@ -24,7 +24,7 @@ function HomeContent() {
       <div
         className={`
           transition-all duration-500 ease-in-out overflow-hidden
-          ${showForm ? 'max-h-[500px] opacity-100 scale-100' : 'max-h-0 opacity-0 scale-y-75'}
+          ${showForm ? 'opacity-100 scale-100' : 'max-h-0 opacity-0 scale-y-75'}
         `}
       >
         <DocumentForm handleSubmit={handleAddDocument} />
