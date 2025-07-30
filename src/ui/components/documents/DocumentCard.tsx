@@ -7,8 +7,8 @@ export default function DocumentCard({
 }: DocumentCardProps) {
   return (
     <div
-      className={`border w-full px-6 py-8 bg-white rounded flex ${
-        isColumnView ? "flex-row justify-between" : "flex-col justify-between"
+      className={`border w-full px-6 py-8 bg-white rounded ${
+        isColumnView ? "flex flex-row justify-between items-start gap-6" : "flex flex-col space-y-4"
       }`}
     >
       <div className="flex flex-col">
@@ -16,23 +16,15 @@ export default function DocumentCard({
         <p>Versión: {Version}</p>
       </div>
 
-      <div
-        className={`flex flex-col ${
-          isColumnView ? "" : "space-y-2"
-        }`}
-      >
+      <div className="flex flex-col">
         {Contributors?.map((c, index) => (
-          <p key={index}>{c.Name}</p>
+          <p key={index} className="text-sm text-gray-700">{c.Name}</p>
         ))}
       </div>
 
-      <div
-        className={`flex flex-col ${
-          isColumnView ? "" : "space-y-2"
-        }`}
-      >
+      <div className="flex flex-col">
         {Attachments?.map((attachment, index) => (
-          <p key={index}>{attachment}</p>
+          <p key={index} className="text-sm text-gray-700">{attachment}</p>
         ))}
       </div>
     </div>
