@@ -52,6 +52,45 @@ Este proyecto es una aplicación React que permite visualizar y gestionar docume
 
 ## Componentes Clave
 
+Claro, te añado la explicación de `documentsApi.ts` y `fetchDocuments` en el README.md justo después de la sección "Componentes Clave":
+
+
+## Componentes Clave
+
+### `src/app/services/documentsApi.ts`
+
+* Archivo que simula la obtención de documentos desde un recurso local JSON (`documents.json`).
+* Exporta la función `fetchDocuments` que devuelve una promesa con la lista de documentos después de un retardo simulado de 200ms.
+* Utiliza el tipo `Document` para asegurar la estructura de los datos.
+
+```ts
+import documents from "../../assets/documents.json";
+import { Document } from "../../domain/document";
+
+export async function fetchDocuments(): Promise<Document[]> {
+  // Simulamos un fetch asíncrono
+  return new Promise(resolve => setTimeout(() => resolve(documents as Document[]), 200));
+}
+```
+
+---
+
+### `src/app/useCases/fetchDocuments.ts`
+
+* Caso de uso que encapsula la llamada a `fetchDocuments` desde la capa de servicios.
+* Exporta la función `loadDocuments` que simplemente obtiene y devuelve la lista de documentos.
+* Permite desacoplar la lógica de obtención de datos para facilitar cambios futuros (por ejemplo, migrar a un API real).
+
+```ts
+import { fetchDocuments } from "../services/documentsApi";
+import { Document } from "../../domain/document";
+
+export async function loadDocuments(): Promise<Document[]> {
+  const docs: Document[] = await fetchDocuments();
+  return docs;
+}
+```
+
 ### `src/context/DocumentContext.tsx`
 
 * Define el contexto global que mantiene la lista de documentos, la ordenación, el modo de vista y la notificación.
