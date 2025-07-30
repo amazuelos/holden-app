@@ -21,7 +21,7 @@ export default function DocumentCard({
           isColumnView ? "" : "space-y-2"
         }`}
       >
-        {Contributors.map((c, index) => (
+        {Contributors?.map((c, index) => (
           <p key={index}>{c.Name}</p>
         ))}
       </div>
@@ -31,7 +31,7 @@ export default function DocumentCard({
           isColumnView ? "" : "space-y-2"
         }`}
       >
-        {Attachments.map((attachment, index) => (
+        {Attachments?.map((attachment, index) => (
           <p key={index}>{attachment}</p>
         ))}
       </div>
